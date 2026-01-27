@@ -1,0 +1,225 @@
+@import "tailwindcss";
+
+@font-face {
+  font-family: 'TableCardCN';
+  src: url('/fonts/SourceHanSerif.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+
+@font-face {
+  font-family: 'TableCardEN';
+  src: url('/fonts/TraditionalArabic.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+
+:root {
+  --card-width: 357mm;
+  --card-height: 268mm;
+  --fold-line: 134mm;
+}
+
+body {
+  @apply bg-slate-50 text-slate-900 min-h-screen text-[14px];
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+.card-container {
+  width: var(--card-width);
+  height: var(--card-height);
+  background: white;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+  flex-shrink: 0;
+}
+
+.print-area {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+}
+
+.card-side {
+  height: 50%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  padding: 0 20mm;
+  text-align: center;
+}
+
+.card-side-top {
+  transform: rotate(180deg);
+}
+
+/* Crop Marks - Original L-Style */
+.crop-mark {
+  position: absolute;
+  width: 15mm;
+  height: 15mm;
+  border-color: #000;
+  border-style: solid;
+  pointer-events: none;
+  opacity: 1;
+}
+
+/* --- Top Left --- */
+.crop-top-left {
+  top: 0;
+  left: 0;
+  border-width: 1pt 0 0 1pt;
+}
+
+/* --- Top Right --- */
+.crop-top-right {
+  top: 0;
+  right: 0;
+  border-width: 1pt 1pt 0 0;
+}
+
+/* --- Bottom Left --- */
+.crop-bottom-left {
+  bottom: 0;
+  left: 0;
+  border-width: 0 0 1pt 1pt;
+}
+
+/* --- Bottom Right --- */
+.crop-bottom-right {
+  bottom: 0;
+  right: 0;
+  border-width: 0 1pt 1pt 0;
+}
+
+.fold-line {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  border-top: 1px dashed rgba(0, 0, 0, 0.1);
+  z-index: 10;
+}
+
+@media print {
+  @page {
+    size: A3 portrait;
+    margin: 0;
+  }
+
+  body {
+    background: white !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 297mm !important;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  .preview-card-wrapper {
+    display: block !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    transform: none !important;
+    /* Reset scale */
+    height: auto !important;
+    margin-bottom: 0 !important;
+  }
+
+  .print-page {
+    width: 297mm !important;
+    height: 420mm !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    page-break-after: always !important;
+    background: white !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    position: relative !important;
+  }
+
+  .card-container {
+    box-shadow: none !important;
+    margin: 0 !important;
+    flex-shrink: 0 !important;
+  }
+
+  .print-rotate-mode .card-container {
+    transform: rotate(90deg) !important;
+  }
+}
+
+/* UI Preview Utilities */
+.preview-card-wrapper {
+  margin-bottom: 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.preview-card-wrapper:last-child {
+  margin-bottom: 100px;
+}
+
+.card-ui-divider {
+  width: 100%;
+  max-width: var(--card-width);
+  margin: 40px 0;
+  padding: 0 20mm;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #e2e8f0;
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #cbd5e1;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-slate-200 rounded-full hover:bg-slate-300;
+}
+
+@theme {
+  --color-brand-50: #f0f9ff;
+  --color-brand-100: #e0f2fe;
+  --color-brand-200: #bae6fd;
+  --color-brand-300: #7dd3fc;
+  --color-brand-400: #38bdf8;
+  --color-brand-500: #0ea5e9;
+  --color-brand-600: #0284c7;
+  --color-brand-700: #0369a1;
+  --color-brand-800: #075985;
+  --color-brand-900: #0c4a6e;
+}

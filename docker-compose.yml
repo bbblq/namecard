@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  zhuoka-app:
+    container_name: zhuoka-app
+    image: zhuoka-app:latest
+    build: .
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    volumes:
+      # This is the persistence volume. Data on the host follows the container lifecycle if mapped properly.
+      - ./zhuoka-data:/app/data
+    environment:
+      - PORT=80
+      - DATA_DIR=/app/data
