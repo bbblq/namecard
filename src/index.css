@@ -44,7 +44,8 @@ body {
   flex-direction: column;
   height: 100%;
   width: 100%;
-  overflow: hidden; /* Keep content clipped if needed, but allow marks on container */
+  overflow: hidden;
+  /* Keep content clipped if needed, but allow marks on container */
 }
 
 /* ... existing styles ... */
@@ -74,35 +75,36 @@ body {
   border-style: solid;
   pointer-events: none;
   opacity: 1;
-  z-index: 50; /* Ensure on top */
+  z-index: 50;
+  /* Ensure on top */
 }
 
 /* --- Top Left --- */
 .crop-top-left {
   top: 0;
   left: 0;
-  border-width: 1pt 0 0 1pt;
+  border-width: 0.35mm 0 0 0.35mm;
 }
 
 /* --- Top Right --- */
 .crop-top-right {
   top: 0;
   right: 0;
-  border-width: 1pt 1pt 0 0;
+  border-width: 0.35mm 0.35mm 0 0;
 }
 
 /* --- Bottom Left --- */
 .crop-bottom-left {
   bottom: 0;
   left: 0;
-  border-width: 0 0 1pt 1pt;
+  border-width: 0 0 0.35mm 0.35mm;
 }
 
 /* --- Bottom Right --- */
 .crop-bottom-right {
   bottom: 0;
   right: 0;
-  border-width: 0 1pt 1pt 0;
+  border-width: 0 0.35mm 0.35mm 0;
 }
 
 .fold-line {

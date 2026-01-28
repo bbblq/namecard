@@ -182,10 +182,10 @@ const CustomSelect = ({
 const App: React.FC = () => {
   const [cards, setCards] = useState<CardData[]>([]);
   const [fontSize, setFontSize] = useState({
-    chineseName: 120,
-    englishName: 90,
-    chineseCompany: 48,
-    englishCompany: 36,
+    chineseName: 42,
+    englishName: 32,
+    chineseCompany: 17,
+    englishCompany: 13,
   });
 
   const [offsets, setOffsets] = useState({
@@ -203,13 +203,13 @@ const App: React.FC = () => {
   });
 
   const [letterSpacings, setLetterSpacings] = useState({
-    chineseName: 0.1,
-    englishName: 0.05,
+    chineseName: 4,
+    englishName: 1.5,
     chineseCompany: 0,
     englishCompany: 0,
   });
 
-  const [globalSpacing, setGlobalSpacing] = useState(21);
+  const [globalSpacing, setGlobalSpacing] = useState(7.5);
   const [printRotate, setPrintRotate] = useState(true);
   const [previewScale, setPreviewScale] = useState(0.75);
   const printRef = useRef<HTMLDivElement>(null);
@@ -323,8 +323,8 @@ const App: React.FC = () => {
     setOffsets(preset.settings.offsets);
     setFontFamilies(preset.settings.fontFamilies);
     setLetterSpacings(preset.settings.letterSpacings || {
-      chineseName: 0.1,
-      englishName: 0.05,
+      chineseName: 4,
+      englishName: 1.5,
       chineseCompany: 0,
       englishCompany: 0,
     });
@@ -340,10 +340,10 @@ const App: React.FC = () => {
 
   const resetToDefault = () => {
     setFontSize({
-      chineseName: 120,
-      englishName: 90,
-      chineseCompany: 48,
-      englishCompany: 36,
+      chineseName: 42,
+      englishName: 32,
+      chineseCompany: 17,
+      englishCompany: 13,
     });
     setOffsets({
       chineseName: 0,
@@ -358,8 +358,8 @@ const App: React.FC = () => {
       englishCompany: 'TableCardEN',
     });
     setLetterSpacings({
-      chineseName: 0.1,
-      englishName: 0.05,
+      chineseName: 4,
+      englishName: 1.5,
       chineseCompany: 0,
       englishCompany: 0,
     });
@@ -367,7 +367,7 @@ const App: React.FC = () => {
     setShowCropMarks(true);
     setShowFoldLine(false);
     setCropOffset({ x: 0, y: 0 });
-    setGlobalSpacing(21);
+    setGlobalSpacing(7.5);
     setPreviewScale(0.75);
     setCurrentPresetId('');
     setIsPresetMenuOpen(false);
@@ -598,7 +598,7 @@ const App: React.FC = () => {
           </div>
           <div>
             <h1 className="text-lg font-bold text-slate-900 leading-none">桌卡生成器</h1>
-            <p className="text-[10px] text-slate-400 font-medium uppercase tracking-tighter">v3.3 • Server Edition</p>
+            <p className="text-[10px] text-slate-400 font-medium uppercase tracking-tighter">v3.4 • MM Edition</p>
           </div>
         </div>
 
@@ -825,7 +825,7 @@ const App: React.FC = () => {
             <div>
               <div className="flex items-center gap-2 mb-4">
                 <div className="w-1 h-4 bg-brand-500 rounded-full"></div>
-                <h3 className="text-sm font-black text-slate-800 uppercase tracking-widest">排版参数 (PT)</h3>
+                <h3 className="text-sm font-black text-slate-800 uppercase tracking-widest">排版参数 (mm)</h3>
               </div>
 
               <div className="space-y-6">
@@ -921,7 +921,7 @@ const App: React.FC = () => {
 
                   {/* Font Sizes */}
                   <div className="space-y-3">
-                    <p className="text-[10px] font-bold text-slate-400">文字大小 (PT)</p>
+                    <p className="text-[10px] font-bold text-slate-400">文字大小 (mm)</p>
                     {[
                       { label: '主姓名 / 次姓名', keys: ['chineseName', 'englishName'] },
                       { label: '机构名称 / 次要描述', keys: ['chineseCompany', 'englishCompany'] }
@@ -934,8 +934,8 @@ const App: React.FC = () => {
                           </span>
                         </label>
                         <div className="grid grid-cols-2 gap-2">
-                          <input type="number" value={fontSize[group.keys[0] as keyof typeof fontSize]} onChange={(e) => setFontSize({ ...fontSize, [group.keys[0]]: parseInt(e.target.value) || 0 })} className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-sm font-bold" />
-                          <input type="number" value={fontSize[group.keys[1] as keyof typeof fontSize]} onChange={(e) => setFontSize({ ...fontSize, [group.keys[1]]: parseInt(e.target.value) || 0 })} className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-sm font-bold" />
+                          <input type="number" step="0.5" value={fontSize[group.keys[0] as keyof typeof fontSize]} onChange={(e) => setFontSize({ ...fontSize, [group.keys[0]]: parseFloat(e.target.value) || 0 })} className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-sm font-bold" />
+                          <input type="number" step="0.5" value={fontSize[group.keys[1] as keyof typeof fontSize]} onChange={(e) => setFontSize({ ...fontSize, [group.keys[1]]: parseFloat(e.target.value) || 0 })} className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-sm font-bold" />
                         </div>
                       </div>
                     ))}
@@ -945,7 +945,7 @@ const App: React.FC = () => {
 
                   {/* Offsets */}
                   <div className="space-y-3">
-                    <p className="text-[10px] font-bold text-slate-400">位置偏移 (PT)</p>
+                    <p className="text-[10px] font-bold text-slate-400">位置偏移 (mm)</p>
                     {[
                       { label: '主姓名 / 次姓名', keys: ['chineseName', 'englishName'] },
                       { label: '机构名称 / 次要描述', keys: ['chineseCompany', 'englishCompany'] }
@@ -960,14 +960,16 @@ const App: React.FC = () => {
                         <div className="grid grid-cols-2 gap-2">
                           <input
                             type="number"
+                            step="0.5"
                             value={offsets[group.keys[0] as keyof typeof offsets]}
-                            onChange={(e) => setOffsets({ ...offsets, [group.keys[0]]: parseInt(e.target.value) || 0 })}
+                            onChange={(e) => setOffsets({ ...offsets, [group.keys[0]]: parseFloat(e.target.value) || 0 })}
                             className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-sm font-bold"
                           />
                           <input
                             type="number"
+                            step="0.5"
                             value={offsets[group.keys[1] as keyof typeof offsets]}
-                            onChange={(e) => setOffsets({ ...offsets, [group.keys[1]]: parseInt(e.target.value) || 0 })}
+                            onChange={(e) => setOffsets({ ...offsets, [group.keys[1]]: parseFloat(e.target.value) || 0 })}
                             className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-sm font-bold"
                           />
                         </div>
@@ -981,12 +983,13 @@ const App: React.FC = () => {
                   <div className="space-y-2">
                     <div className="flex justify-between text-xs font-black text-slate-400 uppercase">
                       <span>基础行间距</span>
-                      <span className="text-brand-600 font-mono">{globalSpacing}pt</span>
+                      <span className="text-brand-600 font-mono">{globalSpacing}mm</span>
                     </div>
                     <input
                       type="number"
+                      step="0.5"
                       value={globalSpacing}
-                      onChange={(e) => setGlobalSpacing(parseInt(e.target.value) || 0)}
+                      onChange={(e) => setGlobalSpacing(parseFloat(e.target.value) || 0)}
                       className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-sm font-bold"
                     />
                   </div>
@@ -994,7 +997,7 @@ const App: React.FC = () => {
 
                 {/* 7. Tracking */}
                 <div className="bg-slate-50 p-4 rounded-2xl space-y-4">
-                  <h4 className="text-xs font-black text-slate-500 uppercase tracking-wider">字宽 / 字间距 (Tracking)</h4>
+                  <h4 className="text-xs font-black text-slate-500 uppercase tracking-wider">字宽 / 字间距 (mm)</h4>
                   {[
                     { label: '主姓名 / 次姓名', keys: ['chineseName', 'englishName'] },
                     { label: '机构名称 / 次要描述', keys: ['chineseCompany', 'englishCompany'] }
@@ -1003,20 +1006,20 @@ const App: React.FC = () => {
                       <label className="text-xs font-black text-slate-400 uppercase flex justify-between">
                         <span>{group.label}</span>
                         <span className="text-brand-600 font-mono">
-                          {letterSpacings[group.keys[0] as keyof typeof letterSpacings].toFixed(2)} / {letterSpacings[group.keys[1] as keyof typeof letterSpacings].toFixed(2)}
+                          {letterSpacings[group.keys[0] as keyof typeof letterSpacings]} / {letterSpacings[group.keys[1] as keyof typeof letterSpacings]}
                         </span>
                       </label>
                       <div className="grid grid-cols-2 gap-2">
                         <input
                           type="number"
-                          step="0.01"
+                          step="0.1"
                           value={letterSpacings[group.keys[0] as keyof typeof letterSpacings]}
                           onChange={(e) => setLetterSpacings({ ...letterSpacings, [group.keys[0]]: parseFloat(e.target.value) || 0 })}
                           className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-sm font-bold"
                         />
                         <input
                           type="number"
-                          step="0.01"
+                          step="0.1"
                           value={letterSpacings[group.keys[1] as keyof typeof letterSpacings]}
                           onChange={(e) => setLetterSpacings({ ...letterSpacings, [group.keys[1]]: parseFloat(e.target.value) || 0 })}
                           className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-sm font-bold"
@@ -1090,19 +1093,19 @@ const App: React.FC = () => {
                       <ul className="space-y-3 text-xs text-slate-600 leading-6 font-medium">
                         <li className="relative pl-3.5">
                           <div className="absolute left-0 top-[0.6rem] w-1.5 h-1.5 bg-brand-500 rounded-full"></div>
-                          <span>目标打印机：<span className="inline-block text-slate-900 font-bold bg-white px-1.5 py-0.5 rounded border border-slate-200 align-baseline leading-none">Adobe PDF</span> 或实体打印机</span>
+                          <span>目标打印机：建议使用 <span className="font-bold text-slate-800">Microsoft Print to PDF</span> 预览，或直接连接 A3 打印机。</span>
                         </li>
                         <li className="relative pl-3.5">
                           <div className="absolute left-0 top-[0.6rem] w-1.5 h-1.5 bg-brand-500 rounded-full"></div>
-                          <span>纸张尺寸：务必设为 <span className="inline-block text-slate-900 font-bold bg-white px-1.5 py-0.5 rounded border border-slate-200 align-baseline leading-none">A3</span></span>
+                          <span>纸张设置：务必设为 <span className="inline-block text-slate-900 font-bold bg-white px-1.5 py-0.5 rounded border border-slate-200 align-baseline leading-none">A3</span></span>
                         </li>
                         <li className="relative pl-3.5">
                           <div className="absolute left-0 top-[0.6rem] w-1.5 h-1.5 bg-brand-500 rounded-full"></div>
-                          <span>缩放比例：务必设为 <span className="inline-block text-red-500 font-bold bg-white px-1.5 py-0.5 rounded border border-red-100 align-baseline leading-none">100% (默认)</span></span>
-                        </li>
-                        <li className="relative pl-3.5">
-                          <div className="absolute left-0 top-[0.6rem] w-1.5 h-1.5 bg-brand-500 rounded-full"></div>
-                          <span>边距选项：选择 <span className="inline-block text-slate-900 font-bold bg-white px-1.5 py-0.5 rounded border border-slate-200 align-baseline leading-none">无 / 最小值</span></span>
+                          <span>缩放模式：<span className="inline-block text-red-600 font-bold bg-red-50 px-1.5 py-0.5 rounded border border-red-100 align-baseline leading-none">必须选 实际大小 (100%)</span></span>
+                          <p className="mt-1.5 text-slate-500 text-[11px] leading-relaxed border-l-2 border-red-100 pl-2">
+                            <span className="font-bold text-red-500">禁止“适应纸张”：</span>这会导致尺寸缩小，刻度尺测量不准。<br />
+                            <span className="font-bold text-slate-600">关于白边：</span>设计已预留充足安全区，打印机物理无法打印的边缘<span className="font-bold">不会</span>截断内容，请放心输出。
+                          </p>
                         </li>
                       </ul>
                     </div>
@@ -1170,49 +1173,49 @@ const App: React.FC = () => {
                             { side: 'top', className: 'card-side card-side-top' },
                             { side: 'bottom', className: 'card-side' }
                           ].map((view) => (
-                            <div key={view.side} className={view.className} style={{ gap: `${globalSpacing}pt` }}>
+                            <div key={view.side} className={view.className} style={{ gap: `${globalSpacing}mm` }}>
                               <div style={{
-                                fontSize: `${fontSize.chineseName}pt`,
+                                fontSize: `${fontSize.chineseName}mm`,
                                 fontFamily: fontFamilies.chineseName,
                                 letterSpacing: `${(enableTwoCharWidening && /^[\u4e00-\u9fa5]{2}$/.test(card.chineseName.trim()))
-                                  ? (1 + 2 * letterSpacings.chineseName)
-                                  : letterSpacings.chineseName}em`,
+                                  ? (fontSize.chineseName + 2 * letterSpacings.chineseName)
+                                  : letterSpacings.chineseName}mm`,
                                 lineHeight: 1.1,
                                 color: '#000',
-                                transform: `translateY(${offsets.chineseName + 25}pt)`,
+                                transform: `translateY(${offsets.chineseName + 9}mm)`,
                                 marginRight: `-${(enableTwoCharWidening && /^[\u4e00-\u9fa5]{2}$/.test(card.chineseName.trim()))
-                                  ? (1 + 2 * letterSpacings.chineseName)
-                                  : letterSpacings.chineseName}em`
+                                  ? (fontSize.chineseName + 2 * letterSpacings.chineseName)
+                                  : letterSpacings.chineseName}mm`
                               }} className="">{card.chineseName}</div>
 
                               <div style={{
-                                fontSize: `${fontSize.englishName}pt`,
+                                fontSize: `${fontSize.englishName}mm`,
                                 fontFamily: fontFamilies.englishName,
-                                letterSpacing: `${letterSpacings.englishName}em`,
+                                letterSpacing: `${letterSpacings.englishName}mm`,
                                 lineHeight: 1.1,
                                 color: '#000',
-                                transform: `translateY(${offsets.englishName + 12}pt)`,
-                                marginRight: `-${letterSpacings.englishName}em`
+                                transform: `translateY(${offsets.englishName + 4}mm)`,
+                                marginRight: `-${letterSpacings.englishName}mm`
                               }} className="">{card.englishName}</div>
 
                               <div style={{
-                                fontSize: `${fontSize.chineseCompany}pt`,
+                                fontSize: `${fontSize.chineseCompany}mm`,
                                 fontFamily: fontFamilies.chineseCompany,
-                                letterSpacing: `${letterSpacings.chineseCompany}em`,
+                                letterSpacing: `${letterSpacings.chineseCompany}mm`,
                                 lineHeight: 1.1,
                                 color: '#000',
-                                transform: `translateY(${offsets.chineseCompany - 5}pt)`,
-                                marginRight: `-${letterSpacings.chineseCompany}em`
+                                transform: `translateY(${offsets.chineseCompany - 2}mm)`,
+                                marginRight: `-${letterSpacings.chineseCompany}mm`
                               }} className="max-w-[80%] whitespace-normal">{card.chineseCompany}</div>
 
                               <div style={{
-                                fontSize: `${fontSize.englishCompany}pt`,
+                                fontSize: `${fontSize.englishCompany}mm`,
                                 fontFamily: fontFamilies.englishCompany,
-                                letterSpacing: `${letterSpacings.englishCompany}em`,
+                                letterSpacing: `${letterSpacings.englishCompany}mm`,
                                 lineHeight: 1.1,
                                 color: '#000',
-                                transform: `translateY(${offsets.englishCompany - 10}pt)`,
-                                marginRight: `-${letterSpacings.englishCompany}em`
+                                transform: `translateY(${offsets.englishCompany - 3.5}mm)`,
+                                marginRight: `-${letterSpacings.englishCompany}mm`
                               }} className="max-w-[80%] whitespace-normal">{card.englishCompany}</div>
                             </div>
                           ))}
