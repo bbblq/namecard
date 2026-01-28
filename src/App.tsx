@@ -890,16 +890,18 @@ const App: React.FC = () => {
                       <div className="grid grid-cols-2 gap-2">
                         <input
                           type="number"
+                          step="0.1"
                           placeholder="宽"
                           value={cropOffset.x}
-                          onChange={(e) => setCropOffset(prev => ({ ...prev, x: parseInt(e.target.value) || 0 }))}
+                          onChange={(e) => setCropOffset(prev => ({ ...prev, x: parseFloat(e.target.value) || 0 }))}
                           className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-sm font-bold"
                         />
                         <input
                           type="number"
+                          step="0.1"
                           placeholder="高"
                           value={cropOffset.y}
-                          onChange={(e) => setCropOffset(prev => ({ ...prev, y: parseInt(e.target.value) || 0 }))}
+                          onChange={(e) => setCropOffset(prev => ({ ...prev, y: parseFloat(e.target.value) || 0 }))}
                           className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-sm font-bold"
                         />
                       </div>
@@ -1192,11 +1194,27 @@ const App: React.FC = () => {
                               const baseLeftMargin = (a3Width - cardWidth) / 2;   // (420-355)/2 = 32.5mm
                               const baseTopMargin = (a3Height - cardHeight) / 2;  // (297-270)/2 = 13.5mm
 
-                              // Actual distances considering crop offset
-                              const leftDist = baseLeftMargin - cropOffset.x;
-                              const rightDist = baseLeftMargin + cropOffset.x;
-                              const topDist = baseTopMargin - cropOffset.y;
-                              const bottomDist = baseTopMargin + cropOffset.y;
+                              // Calculate actual distances from crop marks to paper edges
+                              // 
+                              // Crop marks are positioned at:
+                              //   - Top-left: (baseLeftMargin - cropOffset.x, baseTopMargin - cropOffset.y)
+                              //   - Top-right: (A3width - baseLeftMargin + cropOffset.x, baseTopMargin - cropOffset.y)
+                              //   - Bottom-left: (baseLeftMargin - cropOffset.x, A3height - baseTopMargin + cropOffset.y)
+                              //   - Bottom-right: (A3width - baseLeftMargin + cropOffset.x, A3height - baseTopMargin + cropOffset.y)
+                              //
+                              // Wait, that's wrong. Let me reconsider...
+                              // 
+                              // Crop marks use CSS: left: -cropOffset.x, right: -cropOffset.x, etc.
+                              // This means when cropOffset.x = -70:
+                              //   - left: -(-70) = 70mm from the card's left edge
+                              //   - right: -(-70) = 70mm from the card's right edge
+                              //
+                              // The card itself is centered at baseLeftMargin from paper edge.
+                              // So crop mark's distance to paper edge = baseMargin + (-cropOffset)
+                              //
+                              // For symmetric display, all corners should show the same base distances:
+                              const horizontalDist = baseLeftMargin - cropOffset.x;  // Distance to nearest left/right edge
+                              const verticalDist = baseTopMargin - cropOffset.y;      // Distance to nearest top/bottom edge
 
                               return (
                                 <>
@@ -1212,7 +1230,7 @@ const App: React.FC = () => {
                                       fontFamily: 'monospace',
                                       whiteSpace: 'nowrap'
                                     }}>
-                                      ↑{topDist.toFixed(1)}mm
+                                      ↑{verticalDist.toFixed(1)}mm
                                     </span>
                                     <span style={{
                                       position: 'absolute',
@@ -1224,7 +1242,7 @@ const App: React.FC = () => {
                                       fontFamily: 'monospace',
                                       whiteSpace: 'nowrap'
                                     }}>
-                                      ←{leftDist.toFixed(1)}mm
+                                      ←{horizontalDist.toFixed(1)}mm
                                     </span>
                                   </div>
 
@@ -1240,7 +1258,7 @@ const App: React.FC = () => {
                                       fontFamily: 'monospace',
                                       whiteSpace: 'nowrap'
                                     }}>
-                                      ↑{topDist.toFixed(1)}mm
+                                      ↑{verticalDist.toFixed(1)}mm
                                     </span>
                                     <span style={{
                                       position: 'absolute',
@@ -1252,7 +1270,7 @@ const App: React.FC = () => {
                                       fontFamily: 'monospace',
                                       whiteSpace: 'nowrap'
                                     }}>
-                                      {rightDist.toFixed(1)}mm→
+                                      {horizontalDist.toFixed(1)}mm→
                                     </span>
                                   </div>
 
@@ -1268,7 +1286,7 @@ const App: React.FC = () => {
                                       fontFamily: 'monospace',
                                       whiteSpace: 'nowrap'
                                     }}>
-                                      ↓{bottomDist.toFixed(1)}mm
+                                      ↓{verticalDist.toFixed(1)}mm
                                     </span>
                                     <span style={{
                                       position: 'absolute',
@@ -1280,7 +1298,7 @@ const App: React.FC = () => {
                                       fontFamily: 'monospace',
                                       whiteSpace: 'nowrap'
                                     }}>
-                                      ←{leftDist.toFixed(1)}mm
+                                      ←{horizontalDist.toFixed(1)}mm
                                     </span>
                                   </div>
 
@@ -1296,7 +1314,7 @@ const App: React.FC = () => {
                                       fontFamily: 'monospace',
                                       whiteSpace: 'nowrap'
                                     }}>
-                                      ↓{bottomDist.toFixed(1)}mm
+                                      ↓{verticalDist.toFixed(1)}mm
                                     </span>
                                     <span style={{
                                       position: 'absolute',
@@ -1308,7 +1326,7 @@ const App: React.FC = () => {
                                       fontFamily: 'monospace',
                                       whiteSpace: 'nowrap'
                                     }}>
-                                      {rightDist.toFixed(1)}mm→
+                                      {horizontalDist.toFixed(1)}mm→
                                     </span>
                                   </div>
                                 </>
