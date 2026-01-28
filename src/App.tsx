@@ -210,7 +210,7 @@ const App: React.FC = () => {
   });
 
   const [globalSpacing, setGlobalSpacing] = useState(7.5);
-  const [printRotate, setPrintRotate] = useState(true);
+  const [printRotate, setPrintRotate] = useState(false); // Default to landscape (no rotation)
   const [previewScale, setPreviewScale] = useState(0.75);
   const printRef = useRef<HTMLDivElement>(null);
 
@@ -522,7 +522,7 @@ const App: React.FC = () => {
       <style>{`
         @media print {
             @page {
-                size: A3 portrait;
+                size: A3 landscape;
                 margin: 0;
             }
             html, body {
@@ -543,17 +543,15 @@ const App: React.FC = () => {
                 height: 100%;
                 margin: 0;
                 padding: 0;
-                /* Removed transform: none to allow rotation */
             }
 
             /* 
-               AUTO-SCALE FIX: 
-               If NOT rotated, the card (357mm) exceeds A3 width (297mm).
-               We must scale it down to ~83% (297/357) so crop marks are visible.
+               Card dimensions: 270mm (width) x 355mm (height) when rotated
+               A3 paper: 297mm (width) x 420mm (height)
+               Card fits within A3 when rotated, no scaling needed
             */
             .print-container:not(.print-rotate-mode) .card-container {
-                transform: scale(0.83) !important;
-                transform-origin: center center !important;
+                /* No scaling needed - card fits within A3 */
             }
 
             .preview-card-wrapper {
@@ -569,13 +567,12 @@ const App: React.FC = () => {
                 display: flex !important;
                 justify-content: center !important;
                 align-items: center !important;
-                /* Removed transform: none to allow rotation */
             }
 
             /* The actual content box */
             .print-page {
-                width: 297mm !important; /* Exact A3 width */
-                height: 420mm !important; /* Exact A3 height */
+                width: 420mm !important; /* Exact A3 landscape width */
+                height: 297mm !important; /* Exact A3 landscape height */
                 box-shadow: none !important;
                 border-radius: 0 !important;
                 margin: 0 !important;
@@ -584,6 +581,23 @@ const App: React.FC = () => {
                 display: flex;
                 justify-content: center;
                 align-items: center;
+                background: white !important;
+            }
+
+            /* Ensure crop marks are visible in print */
+            .crop-mark {
+                display: block !important;
+                opacity: 1 !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+
+            /* Ensure distance labels are visible in print */
+            .crop-mark span {
+                display: block !important;
+                opacity: 1 !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
             }
             
             .no-print { display: none !important; }
@@ -1152,18 +1166,154 @@ const App: React.FC = () => {
                     style={{
                       transform: `scale(${previewScale})`,
                       /* Compensate for height loss due to scaling to avoid huge gaps or overlaps */
-                      marginBottom: `calc(-420mm * (1 - ${previewScale}) + 0px)`,
-                      height: '420mm'
+                      marginBottom: `calc(-297mm * (1 - ${previewScale}) + 0px)`,
+                      height: '297mm'
                     }}
                   >
-                    <div className="print-page shadow-2xl">
+                    {/* A3 Paper Background */}
+                    <div className="print-page shadow-2xl" style={{
+                      background: '#f5f5f5', // Light gray A3 paper background
+                      position: 'relative'
+                    }}>
                       <div className="card-container">
                         {showCropMarks && (
                           <>
-                            <div className="crop-mark crop-top-left" style={{ top: `${-cropOffset.y}mm`, left: `${-cropOffset.x}mm` }}></div>
-                            <div className="crop-mark crop-top-right" style={{ top: `${-cropOffset.y}mm`, right: `${-cropOffset.x}mm` }}></div>
-                            <div className="crop-mark crop-bottom-left" style={{ bottom: `${-cropOffset.y}mm`, left: `${-cropOffset.x}mm` }}></div>
-                            <div className="crop-mark crop-bottom-right" style={{ bottom: `${-cropOffset.y}mm`, right: `${-cropOffset.x}mm` }}></div>
+                            {/* Calculate distances from crop marks to A3 paper edges */}
+                            {(() => {
+                              // A3 paper in LANDSCAPE: 420mm (width) x 297mm (height)
+                              // Card on paper: 355mm (length) x 270mm (width when folded)
+                              // Actual namecard after folding: 355mm (length) x 135mm (width)
+                              const a3Width = 420;    // A3 landscape width
+                              const a3Height = 297;   // A3 landscape height
+                              const cardWidth = 355;  // Card length (355mm)
+                              const cardHeight = 270; // Card width when folded (135mm × 2)
+
+                              // Base margins when card is centered on landscape A3
+                              const baseLeftMargin = (a3Width - cardWidth) / 2;   // (420-355)/2 = 32.5mm
+                              const baseTopMargin = (a3Height - cardHeight) / 2;  // (297-270)/2 = 13.5mm
+
+                              // Actual distances considering crop offset
+                              const leftDist = baseLeftMargin - cropOffset.x;
+                              const rightDist = baseLeftMargin + cropOffset.x;
+                              const topDist = baseTopMargin - cropOffset.y;
+                              const bottomDist = baseTopMargin + cropOffset.y;
+
+                              return (
+                                <>
+                                  {/* Top-Left Crop Mark */}
+                                  <div className="crop-mark crop-top-left" style={{ top: `${-cropOffset.y}mm`, left: `${-cropOffset.x}mm` }}>
+                                    <span style={{
+                                      position: 'absolute',
+                                      top: '-6mm',
+                                      left: '-2mm',
+                                      fontSize: '3mm',
+                                      fontWeight: 'bold',
+                                      color: '#000',
+                                      fontFamily: 'monospace',
+                                      whiteSpace: 'nowrap'
+                                    }}>
+                                      ↑{topDist.toFixed(1)}mm
+                                    </span>
+                                    <span style={{
+                                      position: 'absolute',
+                                      top: '0mm',
+                                      left: '-18mm',
+                                      fontSize: '3mm',
+                                      fontWeight: 'bold',
+                                      color: '#000',
+                                      fontFamily: 'monospace',
+                                      whiteSpace: 'nowrap'
+                                    }}>
+                                      ←{leftDist.toFixed(1)}mm
+                                    </span>
+                                  </div>
+
+                                  {/* Top-Right Crop Mark */}
+                                  <div className="crop-mark crop-top-right" style={{ top: `${-cropOffset.y}mm`, right: `${-cropOffset.x}mm` }}>
+                                    <span style={{
+                                      position: 'absolute',
+                                      top: '-6mm',
+                                      right: '-2mm',
+                                      fontSize: '3mm',
+                                      fontWeight: 'bold',
+                                      color: '#000',
+                                      fontFamily: 'monospace',
+                                      whiteSpace: 'nowrap'
+                                    }}>
+                                      ↑{topDist.toFixed(1)}mm
+                                    </span>
+                                    <span style={{
+                                      position: 'absolute',
+                                      top: '0mm',
+                                      right: '-18mm',
+                                      fontSize: '3mm',
+                                      fontWeight: 'bold',
+                                      color: '#000',
+                                      fontFamily: 'monospace',
+                                      whiteSpace: 'nowrap'
+                                    }}>
+                                      {rightDist.toFixed(1)}mm→
+                                    </span>
+                                  </div>
+
+                                  {/* Bottom-Left Crop Mark */}
+                                  <div className="crop-mark crop-bottom-left" style={{ bottom: `${-cropOffset.y}mm`, left: `${-cropOffset.x}mm` }}>
+                                    <span style={{
+                                      position: 'absolute',
+                                      bottom: '-6mm',
+                                      left: '-2mm',
+                                      fontSize: '3mm',
+                                      fontWeight: 'bold',
+                                      color: '#000',
+                                      fontFamily: 'monospace',
+                                      whiteSpace: 'nowrap'
+                                    }}>
+                                      ↓{bottomDist.toFixed(1)}mm
+                                    </span>
+                                    <span style={{
+                                      position: 'absolute',
+                                      bottom: '0mm',
+                                      left: '-18mm',
+                                      fontSize: '3mm',
+                                      fontWeight: 'bold',
+                                      color: '#000',
+                                      fontFamily: 'monospace',
+                                      whiteSpace: 'nowrap'
+                                    }}>
+                                      ←{leftDist.toFixed(1)}mm
+                                    </span>
+                                  </div>
+
+                                  {/* Bottom-Right Crop Mark */}
+                                  <div className="crop-mark crop-bottom-right" style={{ bottom: `${-cropOffset.y}mm`, right: `${-cropOffset.x}mm` }}>
+                                    <span style={{
+                                      position: 'absolute',
+                                      bottom: '-6mm',
+                                      right: '-2mm',
+                                      fontSize: '3mm',
+                                      fontWeight: 'bold',
+                                      color: '#000',
+                                      fontFamily: 'monospace',
+                                      whiteSpace: 'nowrap'
+                                    }}>
+                                      ↓{bottomDist.toFixed(1)}mm
+                                    </span>
+                                    <span style={{
+                                      position: 'absolute',
+                                      bottom: '0mm',
+                                      right: '-18mm',
+                                      fontSize: '3mm',
+                                      fontWeight: 'bold',
+                                      color: '#000',
+                                      fontFamily: 'monospace',
+                                      whiteSpace: 'nowrap'
+                                    }}>
+                                      {rightDist.toFixed(1)}mm→
+                                    </span>
+                                  </div>
+                                </>
+                              );
+                            })()}
                           </>
                         )}
                         {showFoldLine && <div className="fold-line"></div>}

@@ -17,9 +17,12 @@
 }
 
 :root {
-  --card-width: 357mm;
-  --card-height: 268mm;
-  --fold-line: 134mm;
+  --card-width: 355mm;
+  /* Card length (355mm) on landscape A3 */
+  --card-height: 270mm;
+  /* Card width when folded (135mm × 2) on landscape A3 */
+  --fold-line: 135mm;
+  /* Half of card height (270/2) - fold line position */
 }
 
 body {
@@ -118,7 +121,7 @@ body {
 
 @media print {
   @page {
-    size: A3 portrait;
+    size: A3 landscape;
     margin: 0;
   }
 
@@ -126,7 +129,7 @@ body {
     background: white !important;
     margin: 0 !important;
     padding: 0 !important;
-    width: 297mm !important;
+    width: 420mm !important;
   }
 
   .no-print {
@@ -145,8 +148,8 @@ body {
   }
 
   .print-page {
-    width: 297mm !important;
-    height: 420mm !important;
+    width: 420mm !important;
+    height: 297mm !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
@@ -163,6 +166,24 @@ body {
     margin: 0 !important;
     flex-shrink: 0 !important;
     overflow: visible !important;
+  }
+
+  /* Ensure crop marks are visible in print */
+  .crop-mark {
+    opacity: 1 !important;
+    display: block !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+
+  /* Ensure distance labels are visible in print */
+  .crop-mark span {
+    opacity: 1 !important;
+    display: block !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
   }
 
   .print-rotate-mode .card-container {
