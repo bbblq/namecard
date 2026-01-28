@@ -15,8 +15,7 @@ import {
   Type,
   X,
   Check,
-  FileType,
-  MoveHorizontal
+  FileType
 } from 'lucide-react';
 import { Reorder, AnimatePresence, motion } from 'framer-motion';
 
@@ -771,7 +770,33 @@ const App: React.FC = () => {
             </AnimatePresence>
           </div>
 
-          <button onClick={clearAll} className="text-slate-400 hover:text-red-500 px-4 py-2.5 rounded-xl text-sm font-bold transition-all">清空列表</button>
+
+          {/* Portrait Mode Toggle - Moved to Top Nav */}
+          <div className="flex items-center gap-2 border-r border-slate-200 pr-4 mr-2">
+            <span className="text-xs font-bold text-slate-500">纵向</span>
+            <button
+              onClick={() => setPrintRotate(!printRotate)}
+              className={cn("w-8 h-4 rounded-full transition-all relative shrink-0", printRotate ? "bg-brand-600" : "bg-slate-200")}
+            >
+              <div className={cn("absolute top-0.5 w-3 h-3 rounded-full bg-white transition-all shadow-sm", printRotate ? "left-4.5" : "left-0.5")} />
+            </button>
+          </div>
+
+          {/* Preview Scale Control - Moved to Top Nav */}
+          <div className="flex items-center gap-2 border-r border-slate-200 pr-4 mr-2">
+            <span className="text-xs font-bold text-slate-500 whitespace-nowrap">缩放 {Math.round(previewScale * 100)}%</span>
+            <input
+              type="range"
+              min="30"
+              max="100"
+              step="5"
+              value={previewScale * 100}
+              onChange={(e) => setPreviewScale(parseInt(e.target.value) / 100)}
+              className="w-24 h-1 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-brand-600"
+            />
+          </div>
+
+          <button onClick={clearAll} className="text-slate-400 hover:text-red-500 px-3 py-2.5 rounded-xl text-sm font-bold transition-all">清空</button>
           <div className="h-6 w-px bg-slate-100 mx-2"></div>
           <button onClick={downloadTemplate} className="flex items-center gap-2 px-4 py-2.5 text-slate-600 hover:bg-slate-50 rounded-xl text-sm font-bold transition-all border border-slate-200">
             <Download size={16} />
@@ -805,7 +830,7 @@ const App: React.FC = () => {
 
               <div className="space-y-6">
                 <div className="bg-slate-50 p-4 rounded-2xl space-y-4">
-                  {/* Toggle for 2-Char Widening */}
+                  {/* 1. 2-Char Widening */}
                   <div className="flex items-center justify-between border-b border-slate-200 pb-3 mb-2">
                     <div className="flex flex-col">
                       <span className="text-xs font-black text-slate-700">二字名自动加宽</span>
@@ -819,53 +844,7 @@ const App: React.FC = () => {
                     </button>
                   </div>
 
-                  {/* Show Crop Marks Toggle */}
-                  <div className="flex items-center justify-between border-b border-slate-200 pb-3 mb-2">
-                    <span className="text-xs font-black text-slate-700">显示裁剪标记</span>
-                    <button
-                      onClick={() => setShowCropMarks(!showCropMarks)}
-                      className={cn("w-10 h-5 rounded-full transition-all relative shrink-0", showCropMarks ? "bg-brand-600" : "bg-slate-200")}
-                    >
-                      <div className={cn("absolute top-0.5 w-4 h-4 rounded-full bg-white transition-all shadow-sm", showCropMarks ? "left-5.5" : "left-0.5")} />
-                    </button>
-                  </div>
-
-                  {/* Crop Mark Offset Controls (Only show if Crop Marks are enabled) */}
-                  {showCropMarks && (
-                    <div className="bg-slate-100/50 p-3 rounded-xl border border-dashed border-slate-200 mt-2 space-y-3">
-                      <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">裁剪线偏移 (mm)</div>
-
-                      {/* X Offset */}
-                      <div className="space-y-1">
-                        <div className="flex justify-between text-xs text-slate-600">
-                          <span>水平偏移 (宽)</span>
-                          <span className="font-mono font-bold text-brand-600">{cropOffset.x}mm</span>
-                        </div>
-                        <input
-                          type="range" min="-10" max="20" step="1"
-                          value={cropOffset.x}
-                          onChange={(e) => setCropOffset(prev => ({ ...prev, x: parseInt(e.target.value) }))}
-                          className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-brand-600"
-                        />
-                      </div>
-
-                      {/* Y Offset */}
-                      <div className="space-y-1">
-                        <div className="flex justify-between text-xs text-slate-600">
-                          <span>垂直偏移 (高)</span>
-                          <span className="font-mono font-bold text-brand-600">{cropOffset.y}mm</span>
-                        </div>
-                        <input
-                          type="range" min="-10" max="20" step="1"
-                          value={cropOffset.y}
-                          onChange={(e) => setCropOffset(prev => ({ ...prev, y: parseInt(e.target.value) }))}
-                          className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-brand-600"
-                        />
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Show Fold Line Toggle */}
+                  {/* 2. Fold Line */}
                   <div className="flex items-center justify-between border-b border-slate-200 pb-3 mb-2">
                     <span className="text-xs font-black text-slate-700">显示中折线</span>
                     <button
@@ -875,75 +854,46 @@ const App: React.FC = () => {
                       <div className={cn("absolute top-0.5 w-4 h-4 rounded-full bg-white transition-all shadow-sm", showFoldLine ? "left-5.5" : "left-0.5")} />
                     </button>
                   </div>
-                  {[
-                    { label: '主姓名 / 次姓名', keys: ['chineseName', 'englishName'] },
-                    { label: '机构名称 / 次要描述', keys: ['chineseCompany', 'englishCompany'] }
-                  ].map((group, idx) => (
-                    <div key={idx} className="space-y-2">
-                      <label className="text-xs font-black text-slate-400 uppercase flex justify-between">
-                        <span>{group.label}</span>
+
+                  {/* 3. Crop Marks */}
+                  <div className="flex items-center justify-between border-b border-slate-200 pb-3 mb-2">
+                    <span className="text-xs font-black text-slate-700">显示裁剪标记</span>
+                    <button
+                      onClick={() => setShowCropMarks(!showCropMarks)}
+                      className={cn("w-10 h-5 rounded-full transition-all relative shrink-0", showCropMarks ? "bg-brand-600" : "bg-slate-200")}
+                    >
+                      <div className={cn("absolute top-0.5 w-4 h-4 rounded-full bg-white transition-all shadow-sm", showCropMarks ? "left-5.5" : "left-0.5")} />
+                    </button>
+                  </div>
+                  {showCropMarks && (
+                    <div className="bg-slate-100/50 p-3 rounded-xl border border-dashed border-slate-200 mt-2 space-y-2">
+                      <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex justify-between">
+                        <span>裁剪线偏移 (mm)</span>
                         <span className="text-brand-600 font-mono">
-                          {fontSize[group.keys[0] as keyof typeof fontSize]} / {fontSize[group.keys[1] as keyof typeof fontSize]}
+                          {cropOffset.x} / {cropOffset.y}
                         </span>
                       </label>
                       <div className="grid grid-cols-2 gap-2">
-                        <input type="number" value={fontSize[group.keys[0] as keyof typeof fontSize]} onChange={(e) => setFontSize({ ...fontSize, [group.keys[0]]: parseInt(e.target.value) || 0 })} className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-sm font-bold" />
-                        <input type="number" value={fontSize[group.keys[1] as keyof typeof fontSize]} onChange={(e) => setFontSize({ ...fontSize, [group.keys[1]]: parseInt(e.target.value) || 0 })} className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-sm font-bold" />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="bg-blue-50/50 p-4 rounded-2xl space-y-4 border border-blue-100">
-                  <h4 className="text-xs font-black text-blue-900 uppercase tracking-wider">位置精调 (Offset)</h4>
-                  {[
-                    { key: 'chineseName', label: '主姓名上下' },
-                    { key: 'englishName', label: '次姓名上下' },
-                    { key: 'chineseCompany', label: '机构名称上下' },
-                    { key: 'englishCompany', label: '次要描述上下' }
-                  ].map((item) => (
-                    <div key={item.key} className="space-y-1">
-                      <div className="flex justify-between text-xs font-bold text-slate-500">
-                        <span>{item.label}</span>
-                        <span className="font-mono text-blue-600">{offsets[item.key as keyof typeof offsets]}pt</span>
-                      </div>
-                      <input
-                        type="range" min="-150" max="150"
-                        value={offsets[item.key as keyof typeof offsets]}
-                        onChange={(e) => setOffsets({ ...offsets, [item.key]: parseInt(e.target.value) })}
-                        className="w-full h-1 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
-                      />
-                    </div>
-                  ))}
-                </div>
-
-                {/* Tracking (Letter Spacing) Control */}
-                <div className="bg-purple-50/50 p-4 rounded-2xl space-y-4 border border-purple-100">
-                  <h4 className="text-xs font-black text-purple-900 uppercase tracking-wider">字宽 / 字间距 (Tracking)</h4>
-                  {[
-                    { key: 'chineseName', label: '主姓名间距' },
-                    { key: 'englishName', label: '次姓名间距' },
-                    { key: 'chineseCompany', label: '机构名称间距' },
-                    { key: 'englishCompany', label: '次要描述间距' }
-                  ].map((item) => (
-                    <div key={item.key} className="space-y-1">
-                      <div className="flex justify-between text-xs font-bold text-slate-500">
-                        <span>{item.label}</span>
-                        <span className="font-mono text-purple-600">{letterSpacings[item.key as keyof typeof letterSpacings].toFixed(2)}em</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <MoveHorizontal size={14} className="text-purple-300 shrink-0" />
                         <input
-                          type="range" min="-0.2" max="1.5" step="0.05"
-                          value={letterSpacings[item.key as keyof typeof letterSpacings]}
-                          onChange={(e) => setLetterSpacings({ ...letterSpacings, [item.key]: parseFloat(e.target.value) })}
-                          className="w-full h-1 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-purple-600"
+                          type="number"
+                          placeholder="宽"
+                          value={cropOffset.x}
+                          onChange={(e) => setCropOffset(prev => ({ ...prev, x: parseInt(e.target.value) || 0 }))}
+                          className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-sm font-bold"
+                        />
+                        <input
+                          type="number"
+                          placeholder="高"
+                          value={cropOffset.y}
+                          onChange={(e) => setCropOffset(prev => ({ ...prev, y: parseInt(e.target.value) || 0 }))}
+                          className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-sm font-bold"
                         />
                       </div>
                     </div>
-                  ))}
+                  )}
                 </div>
 
+                {/* 4. Font Selection */}
                 <div className="bg-slate-50 p-4 rounded-2xl space-y-4">
                   <h4 className="text-xs font-black text-slate-500 uppercase tracking-wider">列字体指定</h4>
                   {[
@@ -954,7 +904,6 @@ const App: React.FC = () => {
                   ].map((item) => (
                     <div key={item.key} className="space-y-1">
                       <span className="text-xs text-slate-400 font-bold">{item.label}</span>
-                      {/* Replaced Native Select with CustomSelect */}
                       <CustomSelect
                         value={fontFamilies[item.key as keyof typeof fontFamilies]}
                         onChange={(val) => setFontFamilies({ ...fontFamilies, [item.key]: val })}
@@ -964,35 +913,122 @@ const App: React.FC = () => {
                   ))}
                 </div>
 
-                <div className="space-y-3 pt-2">
-                  <div className="flex justify-between text-xs font-black text-slate-400 uppercase">
-                    <span>基础间距</span>
-                    <span className="text-brand-600 font-mono">{globalSpacing}pt</span>
+                {/* 5. Size fine-tuning (Size & Position) */}
+                <div className="bg-slate-50 p-4 rounded-2xl space-y-6">
+                  <h4 className="text-xs font-black text-slate-500 uppercase tracking-wider">
+                    位置精调 (Offset) <span className="text-slate-300">/</span> 文字大小
+                  </h4>
+
+                  {/* Font Sizes */}
+                  <div className="space-y-3">
+                    <p className="text-[10px] font-bold text-slate-400">文字大小 (PT)</p>
+                    {[
+                      { label: '主姓名 / 次姓名', keys: ['chineseName', 'englishName'] },
+                      { label: '机构名称 / 次要描述', keys: ['chineseCompany', 'englishCompany'] }
+                    ].map((group, idx) => (
+                      <div key={idx} className="space-y-2">
+                        <label className="text-xs font-black text-slate-400 uppercase flex justify-between">
+                          <span>{group.label}</span>
+                          <span className="text-brand-600 font-mono">
+                            {fontSize[group.keys[0] as keyof typeof fontSize]} / {fontSize[group.keys[1] as keyof typeof fontSize]}
+                          </span>
+                        </label>
+                        <div className="grid grid-cols-2 gap-2">
+                          <input type="number" value={fontSize[group.keys[0] as keyof typeof fontSize]} onChange={(e) => setFontSize({ ...fontSize, [group.keys[0]]: parseInt(e.target.value) || 0 })} className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-sm font-bold" />
+                          <input type="number" value={fontSize[group.keys[1] as keyof typeof fontSize]} onChange={(e) => setFontSize({ ...fontSize, [group.keys[1]]: parseInt(e.target.value) || 0 })} className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-sm font-bold" />
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                  <input type="range" min="0" max="200" value={globalSpacing} onChange={(e) => setGlobalSpacing(parseInt(e.target.value))} className="w-full h-1 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-brand-600" />
+
+                  <div className="h-px bg-slate-200" />
+
+                  {/* Offsets */}
+                  <div className="space-y-3">
+                    <p className="text-[10px] font-bold text-slate-400">位置偏移 (PT)</p>
+                    {[
+                      { label: '主姓名 / 次姓名', keys: ['chineseName', 'englishName'] },
+                      { label: '机构名称 / 次要描述', keys: ['chineseCompany', 'englishCompany'] }
+                    ].map((group, idx) => (
+                      <div key={idx} className="space-y-2">
+                        <label className="text-xs font-black text-slate-400 uppercase flex justify-between">
+                          <span>{group.label}</span>
+                          <span className="text-brand-600 font-mono">
+                            {offsets[group.keys[0] as keyof typeof offsets]} / {offsets[group.keys[1] as keyof typeof offsets]}
+                          </span>
+                        </label>
+                        <div className="grid grid-cols-2 gap-2">
+                          <input
+                            type="number"
+                            value={offsets[group.keys[0] as keyof typeof offsets]}
+                            onChange={(e) => setOffsets({ ...offsets, [group.keys[0]]: parseInt(e.target.value) || 0 })}
+                            className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-sm font-bold"
+                          />
+                          <input
+                            type="number"
+                            value={offsets[group.keys[1] as keyof typeof offsets]}
+                            onChange={(e) => setOffsets({ ...offsets, [group.keys[1]]: parseInt(e.target.value) || 0 })}
+                            className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-sm font-bold"
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
 
-                <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
-                  <span className="text-xs font-black text-slate-400 uppercase">纵向模式</span>
-                  <button onClick={() => setPrintRotate(!printRotate)} className={cn("w-10 h-5 rounded-full transition-all relative shrink-0", printRotate ? "bg-brand-600" : "bg-slate-200")}>
-                    <div className={cn("absolute top-0.5 w-4 h-4 rounded-full bg-white transition-all", printRotate ? "left-5.5" : "left-0.5")} />
-                  </button>
+                {/* 6. Basic Line Spacing */}
+                <div className="bg-slate-50 p-4 rounded-2xl space-y-4">
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-xs font-black text-slate-400 uppercase">
+                      <span>基础行间距</span>
+                      <span className="text-brand-600 font-mono">{globalSpacing}pt</span>
+                    </div>
+                    <input
+                      type="number"
+                      value={globalSpacing}
+                      onChange={(e) => setGlobalSpacing(parseInt(e.target.value) || 0)}
+                      className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-sm font-bold"
+                    />
+                  </div>
                 </div>
 
-                <div className="pt-4 border-t border-slate-100 space-y-3">
-                  <div className="flex justify-between text-xs font-black text-slate-400 uppercase">
-                    <span>预览缩放 (仅屏幕)</span>
-                    <span className="text-brand-600 font-mono">{Math.round(previewScale * 100)}%</span>
-                  </div>
-                  <input
-                    type="range"
-                    min="30"
-                    max="100"
-                    value={previewScale * 100}
-                    onChange={(e) => setPreviewScale(parseInt(e.target.value) / 100)}
-                    className="w-full h-1 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-slate-600"
-                  />
+                {/* 7. Tracking */}
+                <div className="bg-slate-50 p-4 rounded-2xl space-y-4">
+                  <h4 className="text-xs font-black text-slate-500 uppercase tracking-wider">字宽 / 字间距 (Tracking)</h4>
+                  {[
+                    { label: '主姓名 / 次姓名', keys: ['chineseName', 'englishName'] },
+                    { label: '机构名称 / 次要描述', keys: ['chineseCompany', 'englishCompany'] }
+                  ].map((group, idx) => (
+                    <div key={idx} className="space-y-2">
+                      <label className="text-xs font-black text-slate-400 uppercase flex justify-between">
+                        <span>{group.label}</span>
+                        <span className="text-brand-600 font-mono">
+                          {letterSpacings[group.keys[0] as keyof typeof letterSpacings].toFixed(2)} / {letterSpacings[group.keys[1] as keyof typeof letterSpacings].toFixed(2)}
+                        </span>
+                      </label>
+                      <div className="grid grid-cols-2 gap-2">
+                        <input
+                          type="number"
+                          step="0.01"
+                          value={letterSpacings[group.keys[0] as keyof typeof letterSpacings]}
+                          onChange={(e) => setLetterSpacings({ ...letterSpacings, [group.keys[0]]: parseFloat(e.target.value) || 0 })}
+                          className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-sm font-bold"
+                        />
+                        <input
+                          type="number"
+                          step="0.01"
+                          value={letterSpacings[group.keys[1] as keyof typeof letterSpacings]}
+                          onChange={(e) => setLetterSpacings({ ...letterSpacings, [group.keys[1]]: parseFloat(e.target.value) || 0 })}
+                          className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-sm font-bold"
+                        />
+                      </div>
+                    </div>
+                  ))}
                 </div>
+
+
+
+
               </div>
             </div>
           </section>
